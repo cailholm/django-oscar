@@ -1,10 +1,8 @@
 from django.conf.urls import patterns, url
 
-from oscar.core.loading import get_class
 from oscar.core.application import Application
-
-MultiFacetedSearchView = get_class('search.views', 'MultiFacetedSearchView')
-MultiFacetedSearchForm = get_class('search.forms', 'MultiFacetedSearchForm')
+from oscar.apps.search.views import MultiFacetedSearchView
+from oscar.apps.search.forms import MultiFacetedSearchForm
 
 
 class SearchApplication(Application):
