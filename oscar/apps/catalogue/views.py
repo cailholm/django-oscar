@@ -13,8 +13,6 @@ ProductAlert = get_model('customer', 'ProductAlert')
 ProductAlertForm = get_class('customer.forms',
                              'ProductAlertForm')
 
-get_product_base_queryset = get_class('catalogue.utils', 'get_product_base_queryset')
-
 
 class ProductDetailView(DetailView):
     context_object_name = 'product'
@@ -86,6 +84,27 @@ class ProductDetailView(DetailView):
         return names
 
 
+def get_product_base_queryset():
+    """
+    Return ``QuerySet`` for product model with related
+    content pre-loaded. The ``QuerySet`` returns unfiltered
+    results for further filtering.
+    """
+    return Product.browsable.select_related(
+        'product_class',
+    ).prefetch_related(
+        'reviews',
+        'variants',
+        'product_options',
+        'product_class__options',
+        'stockrecord',
+        'stockrecord__product',
+        'stockrecord__product__product_class',
+        'stockrecord__partner',
+        'images',
+    ).all()
+
+
 class ProductCategoryView(ListView):
     """
     Browse products in a given category
@@ -95,6 +114,9 @@ class ProductCategoryView(ListView):
     paginate_by = 20
 
     def get_categories(self):
+        """
+        Return a list of the current category and it's ancestors
+        """
         slug = self.kwargs['category_slug']
         try:
             category = Category.objects.get(slug=slug)
