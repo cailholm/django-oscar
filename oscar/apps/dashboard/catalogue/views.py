@@ -211,10 +211,9 @@ class ProductUpdateView(generic.UpdateView):
         stockrecord = None
         if self.object.has_stockrecord:
             stockrecord = self.object.stockrecord
-            
         if not self.is_stockrecord_submitted():
-            return StockRecordForm(self.object.product_class, instance=stockrecord)
-
+            return StockRecordForm(self.object.product_class,
+                                   instance=stockrecord)
         return StockRecordForm(
             self.object.product_class,
             self.request.POST,
@@ -285,17 +284,16 @@ class StockAlertListView(generic.ListView):
         return ctx
 
     def get_queryset(self):
-        queryset = super(StockAlertListView, self).get_queryset()
         if 'status' in self.request.GET:
             self.form = StockAlertSearchForm(self.request.GET)
             if self.form.is_valid():
                 status = self.form.cleaned_data['status']
                 self.description = _('Alerts with status "%s"') % status
-                return queryset.filter(status=status)
+                return self.model.objects.filter(status=status)
         else:
             self.description = _('All alerts')
             self.form = StockAlertSearchForm()
-        return queryset
+        return self.model.objects.all()
 
 
 class CategoryListView(generic.TemplateView):
